@@ -3,14 +3,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { errors } = require("celebrate");
-const { requestLogger, errorLogger } = require("./middleware/logger"); // ⬅️ import dos loggers
+const { requestLogger, errorLogger } = require("./middlewares/logger"); // ⬅️ import dos loggers
 
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const { login, createUser } = require("./controllers/users");
-const { validateSignIn, validateSignUp } = require("./middleware/validators");
-const auth = require("./middleware/auth");
-const errorHandler = require("./middleware/errorHandler");
+const { validateSignIn, validateSignUp } = require("./middlewares/validators");
+const auth = require("./middlewares/auth");
+const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
