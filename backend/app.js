@@ -8,9 +8,9 @@ const { requestLogger, errorLogger } = require("./middlewares/logger"); // â¬…ï¸
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const { login, createUser } = require("./controllers/users");
-const { validateSignIn, validateSignUp } = require("./middlewares/validators");
-const auth = require("./middlewares/auth");
-const errorHandler = require("./middlewares/errorHandler");
+const { validateSignIn, validateSignUp } = require("./middleware/validators");
+const auth = require("./middleware/auth");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
