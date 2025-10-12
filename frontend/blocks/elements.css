@@ -1,0 +1,95 @@
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.elements {
+  max-width: 880px;
+  min-height: 743px;
+  padding-top: 50px;
+  display: grid;
+  grid-template-columns: repeat(3, 282px);
+  grid-template-rows: repeat(2, 361px);
+  gap: 17px;
+  margin: auto;
+}
+
+.elements__card {
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 15px;
+}
+
+.elements__image {
+  width: 282px;
+  height: 282px;
+  border-radius: 15px 15px 0 0;
+  object-fit: cover;
+}
+
+.elements__description {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 246px;
+  height: 23px;
+}
+
+.elements__text {
+  font-family: Inter;
+  font-weight: 900;
+  font-size: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.elements__like-button {
+  width: 21px;
+  height: 19px;
+  cursor: pointer;
+}
+
+.elements__like-button:hover {
+  opacity: 0.6;
+}
+
+.elements__delete-button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 18px;
+  height: 19.3px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.elements__delete-button:hover {
+  opacity: 0.6;
+}
+
+@media screen and (max-width: 1024px) {
+  .elements {
+    max-width: 581px;
+    min-height: 743px;
+    grid-template-columns: repeat(2, 282px);
+    grid-template-rows: repeat(3, 361px);
+    margin: auto;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .elements {
+    max-width: 282px;
+    min-height: 743px;
+    padding-top: 50px;
+    display: grid;
+    grid-template-columns: 282px;
+    grid-template-rows: repeat(6, 361px);
+  }
+}

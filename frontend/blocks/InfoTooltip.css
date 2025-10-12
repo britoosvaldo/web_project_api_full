@@ -1,0 +1,130 @@
+.itp {
+  font-family: "Inter";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+
+.itp__box {
+  position: relative;
+  width: 430px;
+  height: 330px;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  padding: 28px 24px 24px;
+  text-align: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.itp__icon {
+  width: 120px;
+  height: 120px;
+  margin: 60px auto 12px;
+}
+
+.itp__icon--success svg circle {
+  stroke: #2a7bf6;
+  stroke-width: 3;
+}
+
+.itp__icon--success svg path {
+  stroke: #000;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.itp__icon--error svg circle {
+  stroke: #e03131;
+  stroke-width: 3;
+}
+
+.itp__icon--error svg path {
+  stroke: #e03131;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.itp__box:has(.itp__icon--success) {
+  border-color: #2a7bf6;
+}
+
+.itp__box:has(.itp__icon--error) {
+  border-color: #e03131;
+}
+
+.itp__msg {
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1.4;
+  margin: 8px 0 2px;
+}
+
+.itp__close {
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  top: -45px;
+  left: 480px;
+  padding: 0;
+}
+
+.itp__close:hover {
+  opacity: 1;
+}
+
+@media screen and (max-width: 1024px) {
+}
+
+@media screen and (max-width: 720px) {
+  .itp__icon {
+    margin: 40px auto 12px;
+  }
+
+  .itp__close {
+    top: -30px;
+    left: 150px;
+    height: 30px;
+    width: 30px;
+  }
+
+  .itp__box {
+    width: 282px;
+    height: 322px;
+  }
+
+  .popup__container-title {
+    width: 238px;
+    height: 22px;
+    font-size: 18px;
+  }
+
+  .popup__form-fieldset {
+    width: 238px;
+    margin: 10px auto 20px auto;
+  }
+
+  .popup__input {
+    width: 238px;
+    height: 26px;
+  }
+
+  .popup__save-button {
+    width: 238px;
+    height: 46px;
+    font-size: 14px;
+  }
+
+  .popup__create-button {
+    width: 238px;
+    height: 46px;
+    font-size: 14px;
+  }
+}
