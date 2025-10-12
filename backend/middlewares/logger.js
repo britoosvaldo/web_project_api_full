@@ -1,19 +1,18 @@
+const path = require("path");
 const winston = require("winston");
 const expressWinston = require("express-winston");
 
-// 📋 Logger para todas as requisições (request.log)
+const REQUEST_LOG = path.join(__dirname, "..", "request.log");
+const ERROR_LOG = path.join(__dirname, "..", "error.log");
+
 const requestLogger = expressWinston.logger({
-  transports: [new winston.transports.File({ filename: "request.log" })],
+  transports: [new winston.transports.File({ filename: REQUEST_LOG })],
   format: winston.format.json(),
 });
 
-// ⚠️ Logger para erros (error.log)
 const errorLogger = expressWinston.errorLogger({
-  transports: [new winston.transports.File({ filename: "error.log" })],
+  transports: [new winston.transports.File({ filename: ERROR_LOG })],
   format: winston.format.json(),
 });
 
-module.exports = {
-  requestLogger,
-  errorLogger,
-};
+module.exports = { requestLogger, errorLogger };

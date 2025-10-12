@@ -1,16 +1,11 @@
 const { celebrate, Joi, Segments } = require("celebrate");
 const validator = require("validator");
 
-// 🔍 Validador custom para URLs
 const validateURL = (value, helpers) => {
-  if (validator.isURL(value)) {
-    return value;
-  }
-  // "string.uri" é o mesmo tipo de erro do Joi padrão
+  if (validator.isURL(value)) return value;
   return helpers.error("string.uri");
 };
 
-// 💬 Schemas de validação
 const validateSignIn = celebrate({
   [Segments.BODY]: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -28,6 +23,25 @@ const validateSignUp = celebrate({
   }),
 });
 
+const validateUserIdParam = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    userId: Joi.string().hex().length(24).required(),
+  }),
+});
+
+const validateUserUpdate = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+  }),
+});
+
+const validateAvatarUpdate = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    avatar: Joi.string().required().custom(validateURL),
+  }),
+});
+
 const validateCreateCard = celebrate({
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -35,9 +49,19 @@ const validateCreateCard = celebrate({
   }),
 });
 
+const validateCardIdParam = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().hex().length(24).required(),
+  }),
+});
+
 module.exports = {
   validateURL,
   validateSignIn,
   validateSignUp,
+  validateUserIdParam,
+  validateUserUpdate,
+  validateAvatarUpdate,
   validateCreateCard,
+  validateCardIdParam,
 };

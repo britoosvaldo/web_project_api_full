@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -11,6 +12,11 @@ const { login, createUser } = require("./controllers/users");
 const { validateSignIn, validateSignUp } = require("./middlewares/validators");
 const auth = require("./middlewares/auth");
 const errorHandler = require("./middlewares/errorHandler");
+
+console.log("types:", {
+  usersRouter: typeof usersRouter,
+  cardsRouter: typeof cardsRouter,
+});
 
 const app = express();
 
