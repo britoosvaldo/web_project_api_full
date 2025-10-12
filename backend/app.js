@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { errors } = require("celebrate");
-const { requestLogger, errorLogger } = require("./middlewares/logger"); // ⬅️ import dos loggers
+const { requestLogger, errorLogger } = require("./middleware/logger"); // ⬅️ import dos loggers
 
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
