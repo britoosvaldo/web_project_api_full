@@ -2,8 +2,16 @@ const { celebrate, Joi, Segments } = require("celebrate");
 const validator = require("validator");
 
 const validateURL = (value, helpers) => {
-  if (validator.isURL(value)) return value;
-  return helpers.error("string.uri");
+  const ok = validator.isURL(value, {
+    protocols: ["http", "https"],
+    require_protocol: true, // obriga começar com http:// ou https://
+    allow_underscores: true, // tolera _ em host/path
+    allow_trailing_dot: false,
+    allow_protocol_relative_urls: false,
+  });
+  return ok
+    ? value
+    : helpers.message("URL inválida: envie um link http(s) completo");
 };
 
 const validateSignIn = celebrate({

@@ -89,21 +89,30 @@ export default function App() {
       .catch((err) => console.error("Erro ao atualizar avatar:", err));
   }
 
+  // helper para enriquecer card(s)
+  const enrichCard = (card, userId) => {
+    const ownerId =
+      typeof card.owner === "object" && card.owner
+        ? card.owner._id
+        : card.owner;
+
+    return {
+      ...card,
+      isLiked:
+        Array.isArray(card.likes) &&
+        card.likes.some((like) => (like._id || like) === userId),
+      canDelete: String(ownerId) === String(userId),
+    };
+  };
+
   function handleCardLike(card) {
     const isLiked = card.isLiked;
     api
       .changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        const updatedCard = {
-          ...newCard,
-          isLiked:
-            typeof newCard.isLiked === "boolean"
-              ? newCard.isLiked
-              : Array.isArray(newCard.likes) &&
-                newCard.likes.some((like) => like._id === currentUser._id),
-        };
+      .then((updated) => {
+        const enriched = enrichCard(updated, currentUser._id);
         setCards((state) =>
-          state.map((c) => (c._id === card._id ? updatedCard : c))
+          state.map((c) => (c._id === card._id ? enriched : c))
         );
       })
       .catch((error) => console.error("Erro ao curtir/descurtir:", error));
@@ -121,14 +130,9 @@ export default function App() {
   function handleAddPlaceSubmit({ name, link }) {
     api
       .addNewCard(name, link)
-      .then((newCard) => {
-        const enrichedCard = {
-          ...newCard,
-          isLiked:
-            Array.isArray(newCard.likes) &&
-            newCard.likes.some((like) => like._id === currentUser._id),
-        };
-        setCards((prevCards) => [enrichedCard, ...prevCards]);
+      .then((created) => {
+        const enriched = enrichCard(created, currentUser._id);
+        setCards((prevCards) => [enriched, ...prevCards]);
         setPopup(null);
       })
       .catch((err) => console.error("Erro ao adicionar card:", err));
@@ -148,7 +152,11 @@ export default function App() {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
       .then(([userData, cardsData]) => {
         setCurrentUser(userData);
-        setCards(cardsData);
+        // ✅ enriquece todos os cards com isLiked e canDelete
+        const enriched = Array.isArray(cardsData)
+          ? cardsData.map((c) => enrichCard(c, userData._id))
+          : [];
+        setCards(enriched);
         setIsLoggedIn(true);
       })
       .catch((err) => {
@@ -162,10 +170,8 @@ export default function App() {
   }, []);
 
   // Login
-  async function handleLogin({ email, password }) {
+  async function handleLogin(email, password) {
     try {
-      // se seu auth.signin recebe (email, password), mantenha assim;
-      // se recebe objeto, troque para: auth.signin({ email, password })
       const { token } = await auth.signin(email, password);
       setToken(token);
 
@@ -175,7 +181,7 @@ export default function App() {
       ]);
 
       setCurrentUser(user);
-      setCards(initCards);
+      setCards(initCards.map((c) => enrichCard(c, user._id)));
       setIsLoggedIn(true);
 
       setUserEmail(email);
@@ -189,13 +195,12 @@ export default function App() {
   }
 
   // Registro
-  async function handleRegister({ email, password, name, about, avatar }) {
+  async function handleRegister(email, password) {
     try {
-      // compatível com backend que retorna { data } OU { data, token }
-      const res = await auth.signup({ email, password, name, about, avatar });
+      const res = await auth.signup(email, password);
 
       if (res?.token) {
-        // auto-login se o backend devolveu token no signup
+        // auto-login se vier token no signup
         setToken(res.token);
 
         const [user, initCards] = await Promise.all([
@@ -204,7 +209,7 @@ export default function App() {
         ]);
 
         setCurrentUser(user);
-        setCards(initCards);
+        setCards(initCards.map((c) => enrichCard(c, user._id)));
         setIsLoggedIn(true);
 
         setUserEmail(email);
@@ -213,7 +218,7 @@ export default function App() {
         openSuccess("Conta criada com sucesso!");
         navigate("/", { replace: true });
       } else {
-        // caso não venha token, manda para login (com mensagem)
+        // se não vier token, redireciona para login
         openSuccess("Vitória! Você se registrou com sucesso.", () => {
           navigate("/signin", { replace: true });
         });

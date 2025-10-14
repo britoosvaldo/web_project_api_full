@@ -4,14 +4,18 @@ import { Link } from "react-router-dom";
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [submitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
-      await onLogin({ email, password });
+      // ✅ passe dois argumentos
+      await onLogin(email, password);
     } catch (err) {
       console.error("Falha ao autenticar:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -46,7 +50,11 @@ export default function Login({ onLogin }) {
             />
           </label>
 
-          <button className="auth__button" type="submit" disabled={submitting}>
+          <button
+            className="auth__button"
+            type="submit"
+            disabled={submitting || !email || !password}
+          >
             {submitting ? "Entrando..." : "Entrar"}
           </button>
         </form>

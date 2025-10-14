@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
   const token = authorization.replace("Bearer ", "");
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret");
-    req.user = payload; // { _id: ... }
+    req.user = payload;
     return next();
   } catch (e) {
     return res.status(401).send({ message: "Token inválido" });

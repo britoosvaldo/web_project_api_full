@@ -10,7 +10,8 @@ export default function Register({ onRegister }) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await onRegister({ email, password });
+      // ✅ passe dois argumentos
+      await onRegister(email, password);
     } finally {
       setSubmitting(false);
     }
@@ -47,7 +48,11 @@ export default function Register({ onRegister }) {
             />
           </label>
 
-          <button className="auth__button" type="submit" disabled={submitting}>
+          <button
+            className="auth__button"
+            type="submit"
+            disabled={submitting || !email || !password}
+          >
             {submitting ? "Enviando..." : "Inscrever-se"}
           </button>
         </form>

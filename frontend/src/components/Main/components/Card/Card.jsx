@@ -1,27 +1,26 @@
+const base = import.meta.env.BASE_URL;
+
 export default function Card({ card, onImageClick, onCardLike, onCardDelete }) {
-  const { name, link, isLiked } = card;
+  const { name, link, isLiked, canDelete } = card;
 
   const cardLikeButtonClassName = `elements__like-button ${
     isLiked ? "elements__like-button_is-active" : ""
   }`;
 
-  function handleLikeClick() {
-    onCardLike(card);
-  }
-
-  function handleDeleteClick() {
-    onCardDelete(card);
-  }
+  const handleLikeClick = () => onCardLike(card);
+  const handleDeleteClick = () => onCardDelete(card);
 
   return (
     <li className="elements__card">
-      <img
-        className="elements__delete-button"
-        src="/web_project_around_auth/images/delete-button.png"
-        alt="Delete Button"
-        onClick={handleDeleteClick}
-        style={{ cursor: "pointer" }}
-      />
+      {canDelete && (
+        <img
+          className="elements__delete-button"
+          src={`${base}images/delete-button.png`}
+          alt="Remover card"
+          onClick={() => onCardDelete(card)}
+          style={{ cursor: "pointer" }}
+        />
+      )}
 
       <img
         className="elements__image"
@@ -29,20 +28,21 @@ export default function Card({ card, onImageClick, onCardLike, onCardDelete }) {
         alt={name}
         onClick={() => onImageClick(card)}
         style={{ cursor: "pointer" }}
+        onError={(e) => {
+          e.currentTarget.src = "https://picsum.photos/600/400";
+        }}
       />
 
       <div className="elements__description">
         <h2 className="elements__text">{name}</h2>
 
         <img
-          className={cardLikeButtonClassName}
-          src={
-            isLiked
-              ? "/web_project_around_auth/images/like-button.png"
-              : "/web_project_around_auth/images/liked-button.png"
-          }
-          alt="Like Button"
-          onClick={handleLikeClick}
+          className="elements__like-button"
+          src={`${base}images/${
+            isLiked ? "liked-button.png" : "like-button.png"
+          }`}
+          alt={isLiked ? "Remover like" : "Dar like"}
+          onClick={() => onCardLike(card)}
           style={{ cursor: "pointer" }}
         />
       </div>

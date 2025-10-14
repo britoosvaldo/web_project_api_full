@@ -1,11 +1,14 @@
+// app.js
 require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
-const { requestLogger, errorLogger } = require("./middlewares/logger"); // ⬅️ import dos loggers
 
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const { login, createUser } = require("./controllers/users");
@@ -13,22 +16,40 @@ const { validateSignIn, validateSignUp } = require("./middlewares/validators");
 const auth = require("./middlewares/auth");
 const errorHandler = require("./middlewares/errorHandler");
 
-console.log("types:", {
-  usersRouter: typeof usersRouter,
-  cardsRouter: typeof cardsRouter,
-});
+const {
+  PORT = 3000,
+  MONGO_URL = "mongodb://127.0.0.1:27017/aroundb",
+  FRONTEND_URL = "http://localhost:5173",
+  NODE_ENV = "development",
+} = process.env;
 
 const app = express();
+
+// Segurança básica
+app.use(helmet());
+app.disable("x-powered-by");
+
+// Rate limit (ajuste se necessário)
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 // CORS
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [FRONTEND_URL, "http://localhost:5173"],
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // deixe true se algum dia usar cookies/samesite
   })
 );
-app.options(/.*/, cors()); // preflight
+// preflight
+app.options(/.*/, cors());
 
 app.use(express.json());
 
@@ -51,7 +72,7 @@ app.use((req, res) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 });
 
-// ⚠️ Logger de erros (antes do Celebrate)
+// ⚠️ Logger de erros (depois das rotas)
 app.use(errorLogger);
 
 // Erros do Celebrate
@@ -60,14 +81,14 @@ app.use(errors());
 // Middleware de erros centralizado
 app.use(errorHandler);
 
-// Conexão com o MongoDB
-const { PORT = 3000 } = process.env;
+// Conexão com o MongoDB e start
 mongoose
-  .connect("mongodb://127.0.0.1:27017/aroundb")
+  .connect(MONGO_URL)
   .then(() => {
-    console.log("Conectado ao MongoDB!");
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`MongoDB conectado (${MONGO_URL})`);
+    // Bind em 0.0.0.0 para aceitar conexões externas (PM2/nginx)
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Servidor ${NODE_ENV} ouvindo em http://localhost:${PORT}`);
     });
   })
   .catch((err) => console.error("Erro na conexão:", err));

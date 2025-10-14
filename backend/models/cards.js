@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-
-const avatarRegex = /^(https?:\/\/)(www\.)?[\w\-._~:/?#[\]@!$&'()*+,;=]+#?$/;
+const validator = require("validator");
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,7 +12,12 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => avatarRegex.test(v),
+      validator: (v) =>
+        validator.isURL(v, {
+          protocols: ["http", "https"],
+          require_protocol: true,
+          allow_underscores: true,
+        }),
       message: "URL do card inválida",
     },
   },

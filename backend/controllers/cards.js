@@ -12,7 +12,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
-  Card.create({ name, link, owner })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === "ValidationError")
@@ -30,11 +30,9 @@ module.exports.deleteCard = (req, res) => {
       if (!card)
         return res.status(404).send({ message: "Cartão não encontrado" });
       if (String(card.owner) !== String(req.user._id)) {
-        return res
-          .status(403)
-          .send({
-            message: "Acesso negado: você não pode remover este cartão",
-          });
+        return res.status(403).send({
+          message: "Acesso negado: você não pode remover este cartão",
+        });
       }
       return Card.deleteOne({ _id: cardId }).then(() =>
         res.send({ message: "Cartão deletado com sucesso" })
