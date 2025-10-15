@@ -25,11 +25,10 @@ const {
 
 const app = express();
 
-// Segurança básica
+/* ---------- Segurança / limites ---------- */
 app.use(helmet());
 app.disable("x-powered-by");
 
-// Rate limit (ajuste se necessário)
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -39,30 +38,35 @@ app.use(
   })
 );
 
-// CORS
-const ALLOWED_ORIGINS = new Set([
-  process.env.FRONTEND_URL || "http://localhost:5173",
+/* ---------- CORS (Express 5) ---------- */
+const ALLOWED = new Set([
+  FRONTEND_URL,
   "https://around-the-usa.mooo.com",
   "https://www.around-the-usa.mooo.com",
 ]);
 
+// respostas “normais”
 app.use(
   cors({
-    origin: [
-      FRONTEND_URL,
-      "https://around-the-usa.mooo.com",
-      "https://www.around-the-usa.mooo.com",
-    ],
+    origin(origin, cb) {
+      if (!origin || ALLOWED.has(origin)) return cb(null, true);
+      return cb(new Error("CORS not allowed"));
+    },
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// ✅ Substitua o app.options() por isso:
+// pré-flight universal (sem path curinga)
 app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  if (req.method !== "OPTIONS") return next();
+
+  const origin = req.headers.origin;
+  if (!origin || ALLOWED.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin || "*");
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET,POST,PATCH,PUT,DELETE,OPTIONS"
@@ -71,48 +75,41 @@ app.use((req, res, next) => {
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization"
     );
-    res.setHeader("Access-Control-Allow-Credentials", "true");
     return res.sendStatus(204);
   }
-  next();
+  return res.sendStatus(403);
 });
 
+/* ---------- Body / logs ---------- */
 app.use(express.json());
-
-// 🧾 Logger de requisições (antes das rotas)
 app.use(requestLogger);
 
-// 🔓 Rotas públicas
+/* ---------- Rotas públicas ---------- */
 app.post("/signin", validateSignIn, login);
 app.post("/signup", validateSignUp, createUser);
 
-// 🔒 Tudo abaixo requer token
+/* ---------- Auth obrigatório abaixo ---------- */
 app.use(auth);
 
-// Rotas protegidas
+/* ---------- Rotas protegidas ---------- */
 app.use("/users", usersRouter);
 app.use("/cards", cardsRouter);
 
-// 404
+/* ---------- 404 ---------- */
 app.use((req, res) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 });
 
-// ⚠️ Logger de erros (depois das rotas)
+/* ---------- Logs de erro / handlers ---------- */
 app.use(errorLogger);
-
-// Erros do Celebrate
-app.use(errors());
-
-// Middleware de erros centralizado
+app.use(errors()); // celebrate
 app.use(errorHandler);
 
-// Conexão com o MongoDB e start
+/* ---------- DB e start ---------- */
 mongoose
   .connect(MONGO_URL)
   .then(() => {
     console.log(`MongoDB conectado (${MONGO_URL})`);
-    // Bind em 0.0.0.0 para aceitar conexões externas (PM2/nginx)
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Servidor ${NODE_ENV} ouvindo em http://localhost:${PORT}`);
     });
