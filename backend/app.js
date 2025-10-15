@@ -40,15 +40,26 @@ app.use(
 );
 
 // CORS
+const ALLOWED_ORIGINS = new Set([
+  process.env.FRONTEND_URL || "http://localhost:5173",
+  "https://around-the-usa.mooo.com",
+  "https://www.around-the-usa.mooo.com",
+]);
+
 app.use(
   cors({
-    origin: [FRONTEND_URL, "https://around-the-usa.mooo.com"],
+    origin(origin, cb) {
+      // permite ferramentas tipo curl/healthchecks sem Origin
+      if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+      return cb(new Error("CORS not allowed"));
+    },
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // deixe true se algum dia usar cookies/samesite
+    credentials: true,
   })
 );
-// preflight
+
+// responde preflight
 app.options("*", cors());
 
 app.use(express.json());
