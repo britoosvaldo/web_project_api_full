@@ -1,4 +1,3 @@
-// app.js
 require("dotenv").config();
 
 const express = require("express");
@@ -25,7 +24,6 @@ const {
 
 const app = express();
 
-/* ---------- Segurança / limites ---------- */
 app.use(helmet());
 app.disable("x-powered-by");
 
@@ -38,14 +36,12 @@ app.use(
   })
 );
 
-/* ---------- CORS (Express 5) ---------- */
 const ALLOWED = new Set([
   FRONTEND_URL,
   "https://around-the-usa.mooo.com",
   "https://www.around-the-usa.mooo.com",
 ]);
 
-// respostas “normais”
 app.use(
   cors({
     origin(origin, cb) {
@@ -58,7 +54,6 @@ app.use(
   })
 );
 
-// pré-flight universal (sem path curinga)
 app.use((req, res, next) => {
   if (req.method !== "OPTIONS") return next();
 
@@ -80,32 +75,25 @@ app.use((req, res, next) => {
   return res.sendStatus(403);
 });
 
-/* ---------- Body / logs ---------- */
 app.use(express.json());
 app.use(requestLogger);
 
-/* ---------- Rotas públicas ---------- */
 app.post("/signin", validateSignIn, login);
 app.post("/signup", validateSignUp, createUser);
 
-/* ---------- Auth obrigatório abaixo ---------- */
 app.use(auth);
 
-/* ---------- Rotas protegidas ---------- */
 app.use("/users", usersRouter);
 app.use("/cards", cardsRouter);
 
-/* ---------- 404 ---------- */
 app.use((req, res) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 });
 
-/* ---------- Logs de erro / handlers ---------- */
 app.use(errorLogger);
-app.use(errors()); // celebrate
+app.use(errors());
 app.use(errorHandler);
 
-/* ---------- DB e start ---------- */
 mongoose
   .connect(MONGO_URL)
   .then(() => {

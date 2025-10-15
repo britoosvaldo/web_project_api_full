@@ -10,7 +10,6 @@ export default function Login({ onLogin }) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // ✅ passe dois argumentos
       await onLogin(email, password);
     } catch (err) {
       console.error("Falha ao autenticar:", err);

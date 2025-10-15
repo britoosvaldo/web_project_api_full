@@ -37,20 +37,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
-      select: false, // ✅ não retorna por padrão
+      select: false,
     },
   },
   { timestamps: true }
 );
 
-// hash da senha
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// >>> método estático usado no login
 userSchema.statics.findUserByCredentials = async function (email, password) {
   const normEmail = String(email).trim().toLowerCase();
   const user = await this.findOne({ email: normEmail }).select("+password"); // ✅

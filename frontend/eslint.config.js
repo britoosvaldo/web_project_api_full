@@ -24,13 +24,13 @@ export default defineConfig([
       },
     },
     plugins: {
-      react, // ⬅️ ADICIONE
+      react,
     },
     settings: {
-      react: { version: "detect" }, // ⬅️ BOM TER
+      react: { version: "detect" },
     },
     rules: {
-      "react/jsx-uses-vars": "error", // ⬅️ FAZ O JSX CONTAR COMO “USO”
+      "react/jsx-uses-vars": "error",
       "react/react-in-jsx-scope": "off",
       "react/jsx-no-target-blank": "off",
       "react-refresh/only-export-components": [
@@ -38,8 +38,6 @@ export default defineConfig([
         { allowConstantExport: true },
       ],
       "react/prop-types": "off",
-      // opcional: deixar no-unused-vars como aviso enquanto limpa
-      // "no-unused-vars": "warn",
     },
   },
 ]);

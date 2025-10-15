@@ -89,7 +89,6 @@ export default function App() {
       .catch((err) => console.error("Erro ao atualizar avatar:", err));
   }
 
-  // helper para enriquecer card(s)
   const enrichCard = (card, userId) => {
     const ownerId =
       typeof card.owner === "object" && card.owner
@@ -138,7 +137,6 @@ export default function App() {
       .catch((err) => console.error("Erro ao adicionar card:", err));
   }
 
-  // Boot: tenta iniciar sessão com token salvo
   useEffect(() => {
     const savedEmail = localStorage.getItem("userEmail");
     if (savedEmail) setUserEmail(savedEmail);
@@ -152,7 +150,6 @@ export default function App() {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
       .then(([userData, cardsData]) => {
         setCurrentUser(userData);
-        // ✅ enriquece todos os cards com isLiked e canDelete
         const enriched = Array.isArray(cardsData)
           ? cardsData.map((c) => enrichCard(c, userData._id))
           : [];
@@ -200,7 +197,6 @@ export default function App() {
       const res = await auth.signup(email, password);
 
       if (res?.token) {
-        // auto-login se vier token no signup
         setToken(res.token);
 
         const [user, initCards] = await Promise.all([
@@ -218,7 +214,6 @@ export default function App() {
         openSuccess("Conta criada com sucesso!");
         navigate("/", { replace: true });
       } else {
-        // se não vier token, redireciona para login
         openSuccess("Vitória! Você se registrou com sucesso.", () => {
           navigate("/signin", { replace: true });
         });

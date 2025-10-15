@@ -38,6 +38,6 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-cardSchema.path("likes").default([]); // garante o array vazio por padrão
+cardSchema.path("likes").default([]);
 
 module.exports = mongoose.model("Card", cardSchema);

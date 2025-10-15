@@ -10,7 +10,6 @@ export default function Register({ onRegister }) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // ✅ passe dois argumentos
       await onRegister(email, password);
     } finally {
       setSubmitting(false);

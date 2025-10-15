@@ -4,8 +4,8 @@ const validator = require("validator");
 const validateURL = (value, helpers) => {
   const ok = validator.isURL(value, {
     protocols: ["http", "https"],
-    require_protocol: true, // obriga começar com http:// ou https://
-    allow_underscores: true, // tolera _ em host/path
+    require_protocol: true,
+    allow_underscores: true,
     allow_trailing_dot: false,
     allow_protocol_relative_urls: false,
   });

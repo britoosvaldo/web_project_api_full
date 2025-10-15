@@ -28,7 +28,6 @@ const request = (path, options = {}) =>
     ...options,
   }).then(handleJson);
 
-// nomes que seu App.jsx usa
 export const getUserInfo = () => request("/users/me");
 export const editUserInfo = (name, about) =>
   request("/users/me", {

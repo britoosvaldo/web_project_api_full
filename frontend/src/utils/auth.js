@@ -1,15 +1,13 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// helper para tratar respostas
 const handle = async (res) => {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || `Erro ${res.status}`);
   }
-  return res.json(); // esperado { token }
+  return res.json();
 };
 
-// use sempre URL absoluta, sem chance de virar "/signin" relativo ao 5173
 export const signin = (email, password) =>
   fetch(`${BASE_URL}/signin`, {
     method: "POST",
