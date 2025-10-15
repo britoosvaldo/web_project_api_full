@@ -48,19 +48,34 @@ const ALLOWED_ORIGINS = new Set([
 
 app.use(
   cors({
-    origin(origin, cb) {
-      // permite ferramentas tipo curl/healthchecks sem Origin
-      if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-      return cb(new Error("CORS not allowed"));
-    },
+    origin: [
+      FRONTEND_URL,
+      "https://around-the-usa.mooo.com",
+      "https://www.around-the-usa.mooo.com",
+    ],
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// responde preflight
-app.options("/(.*)", cors());
+// ✅ Substitua o app.options() por isso:
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PATCH,PUT,DELETE,OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 app.use(express.json());
 
