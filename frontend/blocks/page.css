@@ -1,8 +1,7 @@
 .page {
-  width: 100%;
-  margin: auto;
-  background-color: black;
-  color: #ffffff;
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
   box-sizing: border-box;
 }
 
